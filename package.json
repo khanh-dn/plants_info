@@ -1,0 +1,21 @@
+{
+  "name": "plant-info",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.6.0",
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
+    "minio": "^8.0.5",
+    "mkdirp": "^3.0.1",
+    "p-limit": "^6.2.0",
+    "prisma": "^6.6.0"
+  }
+}
