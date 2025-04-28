@@ -8,7 +8,7 @@ const MinioService = require("./minioService");
 const { minioClient } = require("./minioService");
 
 const prisma = new PrismaClient();
-const downloadLimit = pLimit(10); // Tối đa 10 download song song
+const downloadLimit = pLimit(1000); // Tối đa 10 download song song
 
 const BUCKET_NAME = process.env.MINIO_BUCKET || "plants";
 
@@ -148,7 +148,7 @@ async function processPlant(plant, saveDir) {
   }
 
   // luôn luôn update dù success hay fail
-  if(newBackupUrls.length > 0) {
+  if (newBackupUrls.length > 0) {
     await prisma.plantInfo.update({
       where: { id: plant.id },
       data: {
@@ -156,7 +156,7 @@ async function processPlant(plant, saveDir) {
       },
     });
   }
-  
+
   if (newBackupUrls.length === 3) {
     console.log(`✅ Plant ID ${plant.id} processed successfully.`);
     console.log(`   - Uploaded 3 images.`);
@@ -173,7 +173,7 @@ async function main() {
   const saveDir = path.join(__dirname, "downloads");
   mkdirp.sync(saveDir);
 
-  const batchSize = 100;
+  const batchSize = 1000;
   let skip = 0;
   let hasMore = true;
   let batchCount = 1;
@@ -198,11 +198,14 @@ async function main() {
       break;
     }
 
-    for (const plant of plants) {
-      const success = await processPlant(plant, saveDir);
+    const results = await Promise.all(
+      plants.map((plant) => processPlant(plant, saveDir))
+    );
+
+    results.forEach((success, index) => {
       if (success) successCount++;
       else failCount++;
-    }
+    });
 
     skip += batchSize;
     batchCount++;
